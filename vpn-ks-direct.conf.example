@@ -1,0 +1,8 @@
+# One IPv4 destination per line. These exceptions use Wi-Fi or Ethernet
+# even when the selected VPN is disconnected. Remove a line to revoke it.
+192.168.*
+# A single public host or network can also be specified:
+# 203.0.113.25
+# 198.51.100.0/24
+
+# Loopback already works, including localhost, 127.0.0.1 and ::1.

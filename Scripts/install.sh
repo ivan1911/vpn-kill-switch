@@ -1,0 +1,1 @@
+../Commands/install-shadowrocket-killswitch.command

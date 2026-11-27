@@ -1,0 +1,6 @@
+pass quick on lo0 all no state
+pass out quick inet proto udp from any port 68 to 255.255.255.255 port 67 no state
+pass in quick inet proto udp from any port 67 to any port 68 no state
+# VPN endpoint rules
+anchor "tunnel" quick
+block drop quick all

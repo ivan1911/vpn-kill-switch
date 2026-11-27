@@ -1,0 +1,1 @@
+../Commands/check-shadowrocket-killswitch.command

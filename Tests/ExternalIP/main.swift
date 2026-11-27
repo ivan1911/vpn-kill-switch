@@ -1,0 +1,72 @@
+import Foundation
+
+let probe = ExternalIP()
+let active = GuardStatus(state: .active, title: "", tunnel: "utun4")
+let blocked = GuardStatus(state: .blocked, title: "", tunnel: "none")
+let inactive = GuardStatus(state: .inactive, title: "")
+var requests: [ExternalIP.Source: [(String?) -> Void]] = [.external: [], .ruSite: []]
+func update(_ state: GuardStatus, at seconds: Double, open: Bool = true) {
+    probe.update(status: state, visible: open, now: seconds) { source, complete in
+        requests[source, default: []].append(complete)
+    }
+}
+
+update(active, at: 0, open: false)
+update(.unread, at: 0)
+precondition(requests.values.allSatisfy { $0.isEmpty })
+update(active, at: 1)
+update(active, at: 2)
+precondition(requests.values.allSatisfy { $0.count == 1 } && probe.value == "Checking…")
+update(blocked, at: 3)
+requests[.external]![0]("192.0.2.5")
+requests[.ruSite]![0]("203.0.113.7")
+precondition(probe.distinctRUAddress == nil)
+precondition(probe.value == "Blocked")
+update(active, at: 4)
+precondition(requests.values.allSatisfy { $0.count == 1 } && probe.value == "Pending")
+update(active, at: 61)
+requests[.ruSite]![1]("203.0.113.7")
+precondition(probe.distinctRUAddress == nil)
+requests[.external]![1]("192.0.2.8")
+precondition(probe.distinctRUAddress == "203.0.113.7")
+update(active, at: 75)
+precondition(requests.values.allSatisfy { $0.count == 2 } && probe.value == "192.0.2.8")
+let newTunnel = GuardStatus(state: .active, title: "", tunnel: "utun9")
+update(newTunnel, at: 76)
+precondition(probe.distinctRUAddress == nil)
+precondition(probe.value == "Pending")
+update(inactive, at: 121)
+requests[.external]![2](nil)
+requests[.ruSite]![2]("203.0.113.7")
+precondition(probe.distinctRUAddress == nil)
+precondition(probe.value == "Unavailable")
+update(inactive, at: 180)
+precondition(requests.values.allSatisfy { $0.count == 3 })
+update(inactive, at: 181, open: false)
+precondition(requests.values.allSatisfy { $0.count == 3 })
+
+update(inactive, at: 182)
+requests[.external]![3]("192.0.2.2")
+requests[.ruSite]![3]("192.0.2.2")
+precondition(probe.distinctRUAddress == nil && probe.value == "192.0.2.2")
+update(inactive, at: 242)
+requests[.external]![4]("192.0.2.2")
+requests[.ruSite]![4](nil)
+precondition(probe.distinctRUAddress == nil && probe.value == "192.0.2.2")
+update(inactive, at: 302)
+requests[.external]![5]("192.0.2.2")
+update(inactive, at: 362)
+requests[.ruSite]![5]("203.0.113.99")
+requests[.external]![6]("192.0.2.2")
+precondition(probe.distinctRUAddress == nil)
+requests[.ruSite]![6]("203.0.113.7")
+precondition(probe.distinctRUAddress == "203.0.113.7")
+update(blocked, at: 363)
+precondition(probe.distinctRUAddress == nil)
+
+for text in ["", "192.0.2.1\u{0}extra", "192.0.2.1\n192.0.2.2", "<html>403</html>", "333.1.1.1",
+             String(repeating: " ", count: 65) + "192.0.2.1"] {
+    precondition(ExternalIP.parse(Data(text.utf8)) == nil)
+}
+precondition(ExternalIP.parse(Data("192.0.2.1\n".utf8)) == "192.0.2.1")
+print("External IPv4 visibility, throttling, route changes, stale replies, errors and parsing passed.")
