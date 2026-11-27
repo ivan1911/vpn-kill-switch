@@ -1,6 +1,6 @@
 # Building and verifying VPN Kill Switch on macOS
 
-Start in the project root on macOS with Xcode Command Line Tools and Python 3. Use a graphical login for the AppKit tests. The user-facing [README](../../README.md) covers setup, CLI commands and offline recovery. Use the [glossary](../../GLOSSARY.md) for names used in the menu.
+Start in the project root on macOS with Xcode Command Line Tools and Python 3. Use a graphical login for the AppKit tests. The user-facing [README](../../README.md) covers installation, day-to-day use and offline recovery. Use the [glossary](../../GLOSSARY.md) for names used in the menu.
 
 ## Follow a change through the app
 
@@ -11,7 +11,7 @@ Start in the project root on macOS with Xcode Command Line Tools and Python 3. U
 | Menu status and reconnect | `main.swift`, `Admin.swift`, `Status.swift`, `Guard/check.sh` | The menu observes the applied VPN profile. A connection event wakes the authorized monitor. The checker reports the rules actually installed. During reconnect, macOS can report Connected before PF allows the interface. Exercise the retry and a late result from the previous selection. |
 | External IPv4 and flag | `ExternalIP.swift`, `GeoIP.swift`, `main.swift`, `SettingsWindow.swift` | Protection fetches the external IPv4 on demand. GeoIP matches that address locally. Check stale replies, missing or invalid data, and retention of the installed database after a failed update. |
 
-The service uses two PF anchors. The base anchor permits loopback, DHCP and the configured server socket before its final block rule. The nested tunnel anchor enforces the direct IPv4 config from `Guard/direct.sh` before it permits the interface of the applied client when connected. An empty tunnel anchor with the base rules active means internet access is blocked. For a status discrepancy, compare the selected profile, allowed tunnel and checker exit code using the [diagnostic commands](../../README.md#commands-and-recovery). For a failed installation, correlate the debug journal with the authorization and installer stages using the [logging guide](../../README.md#diagnose-an-installation-attempt).
+The service uses two PF anchors. The base anchor permits loopback, DHCP and the configured server socket before its final block rule. The nested tunnel anchor enforces the direct IPv4 config from `Guard/direct.sh` before it permits the interface of the applied client when connected. An empty tunnel anchor with the base rules active means internet access is blocked. For a status discrepancy, compare the selected profile, allowed tunnel and checker exit code using the [diagnostic commands](../technical-reference.md#commands-and-recovery). For a failed installation, correlate the debug journal with the authorization and installer stages using the [logging guide](../technical-reference.md#diagnose-an-installation-attempt).
 
 The menu never parses the checker's English sentences. `Admin.swift` runs `check.sh --porcelain`, which prints stable `key=value` lines (`protection`, `tunnel`, `client`, `client-name`, `vpn`, `vpn-interface`, `direct`, `direct-waiting`, `problem`) with the same exit codes, and `Status.swift` reads only those keys. Add a new status as a key in `Guard/check.sh` (documented in its header) and in `Tests/Status`; leave Terminal prose free to change.
 
