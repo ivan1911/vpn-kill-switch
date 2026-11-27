@@ -51,11 +51,23 @@ info = dict(CFBundleIdentifier='io.github.ivan1911.vpn-kill-switch',
 info.update(plistlib.loads(pathlib.Path(sys.argv[5]).read_bytes()))
 pathlib.Path(sys.argv[2]).write_bytes(plistlib.dumps(info))
 PY
-for arch in arm64 x86_64; do
+compile_arch() {
+    arch=$1
     /usr/bin/xcrun swiftc -swift-version 5 -O -target "$arch-apple-macosx13.0" \
         -framework AppKit ExceptionsView.swift SettingsWindow.swift VPNClient.swift Peer.swift MenuGlyph.swift Status.swift GuardConfirmation.swift StatusMenuFeedback.swift ExternalIP.swift GeoIP.swift Admin.swift main.swift "$tmp/Commands.swift" \
         -o "$tmp/VPNKillSwitch-$arch"
-done
-/usr/bin/lipo -create "$tmp/VPNKillSwitch-arm64" "$tmp/VPNKillSwitch-x86_64" -output "$dest/Contents/MacOS/VPNKillSwitch"
+}
+case "${VPN_BUILD_ARCH:-universal}" in
+    arm64)
+        compile_arch arm64
+        mv "$tmp/VPNKillSwitch-arm64" "$dest/Contents/MacOS/VPNKillSwitch"
+        ;;
+    universal)
+        compile_arch arm64
+        compile_arch x86_64
+        /usr/bin/lipo -create "$tmp/VPNKillSwitch-arm64" "$tmp/VPNKillSwitch-x86_64" -output "$dest/Contents/MacOS/VPNKillSwitch"
+        ;;
+    *) echo "VPN_BUILD_ARCH must be arm64 or universal" >&2; exit 2 ;;
+esac
 /usr/bin/codesign --force --sign - "$dest"
 /usr/bin/codesign --verify --strict "$dest"
