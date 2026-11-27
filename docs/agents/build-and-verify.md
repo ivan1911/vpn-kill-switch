@@ -28,9 +28,9 @@ The app, system service and Terminal commands have separate lifetimes. Quitting 
 - After the release PR merges into `main`, read its resulting full commit SHA from the merged pull request on GitHub. Use a clean worktree at that exact revision and run `./build-dmg.sh --release "$merge_sha"` there. The script checks the supplied SHA against HEAD. Release packages use `VERSION+g<7 hex digits>`. Publish the verified image separately after the merge, then update the download links. Keep the last published download available during development.
 - For an isolated development build use a Git worktree. A fresh `git archive` carries its source revision via `.git-revision`. An ordinary source copy without Git metadata displays `+unknown`.
 
-### Publish an Apple Silicon release
+### Publish a macOS release
 
-After merging the release PR, tag its merge commit with `v` followed by the version in `VERSION` and push that tag to GitHub. For example, for version 0.4.1 use `git tag v0.4.1 MERGE_SHA` and `git push origin v0.4.1`. The release workflow builds on macOS with `VPN_BUILD_ARCH=arm64`, mounts the image, verifies the executable and publishes the DMG on the tag’s GitHub Release. Local builds default to universal.
+After merging the release PR, tag its merge commit with `v` followed by the version in `VERSION` and push that tag to GitHub. For example, for version 0.4.1 use `git tag v0.4.1 MERGE_SHA` and `git push origin v0.4.1`. The release workflow calls `Tools/build-release-dmgs.sh MERGE_SHA OUTPUT_DIRECTORY` from the clean release checkout. It builds the universal app, extracts and signs each single-architecture variant, and verifies all three mounted DMGs before publication. Local development builds default to universal.
 
 ## Run the local regression checks
 
