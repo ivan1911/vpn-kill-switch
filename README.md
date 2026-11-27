@@ -16,10 +16,9 @@ The release uses an ad hoc signature. If macOS says it cannot verify the develop
 2. In the VPN Kill Switch menu, open **Settings… → VPN Server**. Choose your client, enter those same values and click **Apply**. The screenshot shows an example server.
 3. In Shadowrocket, set **Global Routing → Proxy**. Connect your chosen VPN client, open the VPN Kill Switch menu and choose **Install Kill Switch…**. Approve the prompt. When the menu reads **Protection: On**, traffic can use the VPN tunnel.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/vpn-server-dark.png">
-  <img src="docs/screenshots/vpn-server.png" width="622" alt="VPN Server settings with a sample Happ Plus server, TCP selected and the Apply button ready.">
-</picture>
+![VPN Server settings with a sample Happ Plus server, TCP selected and the Apply button ready.](docs/screenshots/vpn-server.png)
+
+[View in dark mode](docs/screenshots/vpn-server-dark.png)
 
 ## Use the menu bar
 
@@ -36,10 +35,9 @@ Open **Protection** to see the selected client, its connection state and your ex
 
 Open **Settings → Exceptions**, type the device’s IPv4 address and click **+**, then **Apply**. For example, adding `192.168.1.50` lets that one device bypass the VPN. Add a network only if you want every address in it to bypass the VPN, including while disconnected. To revoke access, select the entry, click **−**, then **Apply**.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/exceptions-dark.png">
-  <img src="docs/screenshots/exceptions.png" width="622" alt="Exceptions settings with one example printer address allowed outside the VPN.">
-</picture>
+![Exceptions settings with one example printer address allowed outside the VPN.](docs/screenshots/exceptions.png)
+
+[View in dark mode](docs/screenshots/exceptions-dark.png)
 
 ## Turn off protection or uninstall
 
