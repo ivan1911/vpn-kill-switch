@@ -1,4 +1,4 @@
-name: Release ARM64 DMG
+name: Release macOS disk images
 
 on:
   push:
@@ -19,39 +19,16 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Build release disk image
-        env:
-          VPN_BUILD_ARCH: arm64
+      - name: Build and verify all three disk images
         run: |
           set -eu
-          version=$(cat VERSION)
-          test "$GITHUB_REF_NAME" = "v$version"
-          ./build-dmg.sh --release "$(git rev-parse HEAD)"
-
-      - name: Verify packaged app
-        run: |
-          set -eu
-          sha=$(git rev-parse HEAD)
-          identifier="$(cat VERSION)+g${sha:0:7}"
-          image="build/VPN Kill Switch-$identifier-arm64.dmg"
-          mount_dir=$(mktemp -d)
-          hdiutil attach -quiet -readonly -nobrowse -mountpoint "$mount_dir" "$image"
-          trap 'hdiutil detach "$mount_dir" -quiet' EXIT
-          bundle="$mount_dir/VPN Kill Switch.app"
-          executable="Contents/MacOS/VPNKillSwitch"
-          test "$(lipo -archs "$bundle/$executable")" = arm64
-          test "$(/usr/libexec/PlistBuddy -c 'Print VPNSourceCommit' "$bundle/Contents/Info.plist")" = "$sha"
-          test "$(/usr/libexec/PlistBuddy -c 'Print VPNBuildIdentifier' "$bundle/Contents/Info.plist")" = "$identifier"
-          codesign --verify --deep --strict "$bundle"
-          cmp "$bundle/$executable" "build/VPN Kill Switch.app/$executable"
-          diff -r Commands "$mount_dir/Commands"
-          test "$(readlink "$mount_dir/Applications")" = /Applications
-          cp "$image" "$RUNNER_TEMP/VPN-Kill-Switch-$GITHUB_REF_NAME-arm64.dmg"
+          test "$GITHUB_REF_NAME" = "v$(cat VERSION)"
+          ./Tools/build-release-dmgs.sh "$(git rev-parse HEAD)" "$RUNNER_TEMP/release"
 
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/VPN-Kill-Switch-$GITHUB_REF_NAME-arm64.dmg" \
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/release/"*.dmg \
             --verify-tag --title "VPN Kill Switch ${GITHUB_REF_NAME#v}" \
-            --notes "Download the ARM64 DMG for an Apple Silicon Mac running macOS 13 or later. Open the image and drag VPN Kill Switch to Applications. The app is ad hoc signed and has not been notarized."
+            --notes "For macOS 13 or later, choose Universal for either Mac, arm64 for Apple Silicon, or x86_64 for Intel. Open the image and drag VPN Kill Switch to Applications. The app is ad hoc signed and has not been notarized."

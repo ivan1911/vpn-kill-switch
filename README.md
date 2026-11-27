@@ -4,11 +4,11 @@ If Shadowrocket or Happ Plus disconnects, VPN Kill Switch blocks ordinary intern
 
 ## Install
 
-1. On an **Apple Silicon Mac running macOS 13 or later**, open the [latest GitHub release](https://github.com/ivan1911/vpn-kill-switch/releases/latest) and download the file ending in **`-arm64.dmg`** under **Assets**.
+1. On a Mac running **macOS 13 or later**, open the [latest GitHub release](https://github.com/ivan1911/vpn-kill-switch/releases/latest). Under **Assets**, choose **`-universal.dmg`** for either Apple Silicon or Intel. For a smaller download, choose **`-arm64.dmg`** for Apple Silicon or **`-x86_64.dmg`** for Intel.
 2. Open the DMG, drag **VPN Kill Switch** to **Applications**, then eject the disk image.
 3. Launch **VPN Kill Switch** from Applications. Its controls are in the macOS menu bar. Approve the administrator prompt to let it read the firewall status.
 
-The release uses an ad hoc signature. If macOS says it cannot verify the developer, check that you downloaded the app from this repository and review [Apple’s first-launch instructions](https://support.apple.com/en-us/102445). For Intel Macs, see [building the universal app](docs/technical-reference.md#source-and-build).
+The release uses an ad hoc signature. If macOS says it cannot verify the developer, check that you downloaded the app from this repository and review [Apple’s first-launch instructions](https://support.apple.com/en-us/102445).
 
 ## Set up your VPN
 
